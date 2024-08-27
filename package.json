@@ -1,0 +1,12 @@
+{
+  "name": "@bayumahadika/pteroapijs",
+  "version": "1.1.0",
+  "main": "Pteroapi.js",
+  "keywords": [],
+  "author": "Bayu Mahadika",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "axios": "^1.7.4"
+  }
+}
