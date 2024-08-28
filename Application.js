@@ -340,6 +340,91 @@ class Application {
       };
     }
   };
+  listLocations = async () => {
+    let locations = [];
+    let next = true;
+    let currentPage = 1;
+    try {
+      while (next) {
+        const { data } = await this.#app.get(`/locations?page=${currentPage}`);
+        locations = locations.concat(data.data);
+        const { total_pages } = data.meta.pagination;
+        next = total_pages < currentPage;
+        currentPage++;
+      }
+      return {
+        error: null,
+        data: locations,
+      };
+    } catch (err) {
+      return {
+        error: err.response?.data.errors || err,
+        data: null,
+      };
+    }
+  };
+  locationDetails = async (locationId) => {
+    try {
+      const { data } = await this.#app.get(`/locations/${locationId}`);
+      return {
+        error: null,
+        data,
+      };
+    } catch (err) {
+      return {
+        error: err.response?.data.errors || err,
+        data: null,
+      };
+    }
+  };
+  createLocation = async ({ short, long }) => {
+    try {
+      const { data } = await this.#app.post(`/locations`, {
+        short,
+        long,
+      });
+      return {
+        error: null,
+        data,
+      };
+    } catch (err) {
+      return {
+        error: err.response?.data.errors || err,
+        data: null,
+      };
+    }
+  };
+  updateLocation = async (locationId, { short, long }) => {
+    try {
+      const { data } = await this.#app.patch(`/locations/${locationId}`, {
+        short,
+        long,
+      });
+      return {
+        error: null,
+        data,
+      };
+    } catch (err) {
+      return {
+        error: err.response?.data.errors || err,
+        data: null,
+      };
+    }
+  };
+  deleteLocation = async (locationId) => {
+    try {
+      const { data } = await this.#app.delete(`/locations/${locationId}`);
+      return {
+        error: null,
+        data,
+      };
+    } catch (err) {
+      return {
+        error: err.response?.data.errors || err,
+        data: null,
+      };
+    }
+  };
 }
 
 module.exports = Application;
