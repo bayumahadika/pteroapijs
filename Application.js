@@ -735,6 +735,75 @@ class Application {
       };
     }
   };
+  listEggs = async (nestId) => {
+    try {
+      const { data } = await this.#app.get(
+        `/nests/${nestId}/eggs?include=nests,servers,config,script,variables`
+      );
+      return {
+        error: null,
+        data: data.data,
+      };
+    } catch (err) {
+      return {
+        error: err.response?.data.errors || err,
+        data: null,
+      };
+    }
+  };
+  eggDetails = async (nestId, eggId) => {
+    try {
+      const { data } = await this.#app.get(`/nests/${nestId}/eggs/${eggId}`);
+      return {
+        error: null,
+        data,
+      };
+    } catch (err) {
+      return {
+        error: err.response?.data.errors || err,
+        data: null,
+      };
+    }
+  };
+  listNests = async () => {
+    let nests = [];
+    let next = true;
+    let currentPage = 1;
+    try {
+      while (next) {
+        const { data } = await this.#app.get(
+          `/nests?page=${currentPage}?include=eggs,servers`
+        );
+        const { total_pages } = data.meta.pagination;
+        next = total_pages < currentPage;
+        currentPage++;
+        nests = nests.concat(data.data);
+      }
+      return {
+        error: null,
+        data: nests,
+      };
+    } catch (err) {
+      return {
+        error: err.response?.data.errors || err,
+        data: null,
+      };
+    }
+  };
+  nestDetails = async (nestId) => {
+    try {
+      const { data } = await this.#app.get(`/nests/${nestId}`);
+      return {
+        error: null,
+        data,
+      };
+    } catch (err) {
+      return {
+        error: err.response?.data.errors || err,
+        data: null,
+      };
+    }
+  };
 }
 
 module.exports = Application;
