@@ -425,6 +425,316 @@ class Application {
       };
     }
   };
+  listServers = async () => {
+    let servers = [];
+    let next = true;
+    let currentPage = 1;
+    try {
+      while (next) {
+        const { data } = await this.#app.get(`/servers?page=${currentPage}`);
+        const { total_pages } = data.meta.pagination;
+        next = total_pages < currentPage;
+        servers = servers.concat(data.data);
+        currentPage++;
+      }
+      return {
+        error: null,
+        data: servers,
+      };
+    } catch (err) {
+      return {
+        error: err.response?.data.errors || err,
+        data: null,
+      };
+    }
+  };
+  serverDetails = async (serverId) => {
+    try {
+      const { data } = await this.#app.get(`/servers/${serverId}`);
+      console.log(data);
+      return {
+        error: null,
+        data,
+      };
+    } catch (err) {
+      return {
+        error: err.response?.data.errors || err,
+        data: null,
+      };
+    }
+  };
+  externalServerDetails = async (externalId) => {
+    try {
+      const { data } = await this.#app.get(`/servers/external/${externalId}`);
+      return {
+        error: null,
+        data,
+      };
+    } catch (err) {
+      return {
+        error: err.response?.data.errors || err,
+        data: null,
+      };
+    }
+  };
+  updateDetails = async (
+    serverId,
+    { name, user, external_id, description }
+  ) => {
+    try {
+      const { data } = await this.#app.patch(`/servers/${serverId}/details`, {
+        name,
+        user,
+        external_id,
+        description,
+      });
+      return {
+        error: null,
+        data,
+      };
+    } catch (err) {
+      return {
+        error: err.response?.data.errors || err,
+        data: null,
+      };
+    }
+  };
+  updateBuild = async (
+    serverId,
+    { allocation, memory, swap, disk, io, cpu, threads, feature_limits = {} }
+  ) => {
+    try {
+      const { data } = await this.#app.patch(`/servers/${serverId}/build`, {
+        allocation,
+        memory,
+        swap,
+        disk,
+        io,
+        cpu,
+        threads,
+        feature_limits,
+      });
+      return {
+        error: null,
+        data,
+      };
+    } catch (err) {
+      return {
+        error: err.response?.data.errors || err,
+        data: null,
+      };
+    }
+  };
+  updateStartup = async (
+    serverId,
+    { startup, environment = {}, egg, image, skip_scripts }
+  ) => {
+    try {
+      const { data } = await this.#app.patch(`/servers/${serverId}/startup`, {
+        startup,
+        environment,
+        egg,
+        image,
+        skip_scripts,
+      });
+      return {
+        error: null,
+        data,
+      };
+    } catch (err) {
+      return {
+        error: err.response?.data.errors || err,
+        data: null,
+      };
+    }
+  };
+  createServer = async ({
+    name,
+    user,
+    egg,
+    docker_image,
+    startup,
+    environment = {},
+    limits = {},
+    feature_limits = {},
+    allocation = {},
+  }) => {
+    try {
+      const { data } = await this.#app.post(`/servers`, {
+        name,
+        user,
+        egg,
+        docker_image,
+        startup,
+        environment,
+        limits,
+        feature_limits,
+        allocation,
+      });
+      return {
+        error: null,
+        data,
+      };
+    } catch (err) {
+      return {
+        error: err.response?.data.errors || err,
+        data: null,
+      };
+    }
+  };
+  suspendServer = async (serverId) => {
+    try {
+      const { data } = await this.#app.post(`/servers/${serverId}/suspend`);
+      return {
+        error: null,
+        data,
+      };
+    } catch (err) {
+      return {
+        error: err.response?.data.errors || err,
+        data: null,
+      };
+    }
+  };
+  unsuspendServer = async (serverId) => {
+    try {
+      const { data } = await this.#app.post(`/servers/${serverId}/unsuspend`);
+      return {
+        error: null,
+        data,
+      };
+    } catch (err) {
+      return {
+        error: err.response?.data.errors || err,
+        data: null,
+      };
+    }
+  };
+  reinstallServer = async (serverId) => {
+    try {
+      const { data } = await this.#app.post(`/servers/${serverId}/reinstall`);
+      return {
+        error: null,
+        data,
+      };
+    } catch (err) {
+      return {
+        error: err.response?.data.errors || err,
+        data: null,
+      };
+    }
+  };
+  deleteServer = async (serverId) => {
+    try {
+      const { data } = await this.#app.delete(`/servers/${serverId}`);
+      return {
+        error: null,
+        data,
+      };
+    } catch (err) {
+      return {
+        error: err.response?.data.errors || err,
+        data: null,
+      };
+    }
+  };
+  forceDeleteServer = async (serverId) => {
+    try {
+      const { data } = await this.#app.delete(`/servers/${serverId}/force`);
+      return {
+        error: null,
+        data,
+      };
+    } catch (err) {
+      return {
+        error: err.response?.data.errors || err,
+        data: null,
+      };
+    }
+  };
+  listDatabases = async (serverId) => {
+    try {
+      const { data } = await this.#app.get(
+        `/servers/${serverId}/databases?include=password,host`
+      );
+      return {
+        error: null,
+        data,
+      };
+    } catch (err) {
+      return {
+        error: err.response?.data.errors || err,
+        data: null,
+      };
+    }
+  };
+  databaseDetails = async (serverId, databaseId) => {
+    try {
+      const { data } = await this.#app.get(
+        `/servers/${serverId}/databases/${databaseId}`
+      );
+      return {
+        error: null,
+        data,
+      };
+    } catch (err) {
+      return {
+        error: err.response?.data.errors || err,
+        data: null,
+      };
+    }
+  };
+  createDatabase = async (serverId, { database, remote, host }) => {
+    try {
+      const { data } = await this.#app.post(`/servers/${serverId}/databases`, {
+        database,
+        remote,
+        host,
+      });
+      return {
+        error: null,
+        data,
+      };
+    } catch (err) {
+      return {
+        error: err.response?.data.errors || err,
+        data: null,
+      };
+    }
+  };
+  resetPassword = async (serverId, databaseId) => {
+    try {
+      const { data } = await this.#app.post(
+        `/servers/${serverId}/databases/${databaseId}/reset-password`,
+        {}
+      );
+      return {
+        error: null,
+        data,
+      };
+    } catch (err) {
+      return {
+        error: err.repsonse?.data.errors || err,
+        data: null,
+      };
+    }
+  };
+  deleteDatabase = async (serverId, databaseId) => {
+    try {
+      const { data } = await this.#app.delete(
+        `/servers/${serverId}/databases/${databaseId}`
+      );
+      return {
+        error: null,
+        data,
+      };
+    } catch (err) {
+      return {
+        error: err.response?.data.errors || err,
+        data: null,
+      };
+    }
+  };
 }
 
 module.exports = Application;
